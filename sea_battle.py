@@ -80,6 +80,22 @@ class OnePlayer(tk.Toplevel):
 
 
 
+    def check_ship_destroyed(self):
+        ship_destroyed = {}
+        for ship, values in self.ships.items():
+            list_values = list(values.values())
+            if list_values.count("-") == len(list_values):
+                ship_destroyed[ship] = values
+                del self.ships[ship]
+                break
+
+        return ship_destroyed
+
+
+
+
+
+
     def set_coordinates(self, event):
         n_x = event.x // self.step_x
         n_y = event.y // self.step_y
@@ -87,8 +103,6 @@ class OnePlayer(tk.Toplevel):
         for ship in self.ships.values():
             if not test:
                 for coord, val in ship.items():
-                    # print(coord)
-                    # print((n_x, n_y) == coord)
                     if (n_x, n_y) == coord:
                         test = True
                         ship[n_x, n_y] = "-"
@@ -102,6 +116,12 @@ class OnePlayer(tk.Toplevel):
             self.field_one_coord[n_x, n_y] = "0"
 
         print(self.ships)
+        ship_destroyed = self.check_ship_destroyed()
+        print(self.ships)
+        if ship_destroyed:
+            print("Корабль уничтожен")
+        else:
+            print("Неа")
 
         self.update_fild()
 
@@ -130,8 +150,6 @@ class OnePlayer(tk.Toplevel):
                                            n_x + 3 * self.step_x // 8 + self.step_x // 4,
                                            n_y + 3 * self.step_y // 8 + self.step_y // 4,
                                            fill="red", tags=["X"])
-
-
 
 
     def field_creation(self, row, col):
