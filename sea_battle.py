@@ -53,16 +53,17 @@ class OnePlayer(tk.Toplevel):
 
         self.field_one = self.field_creation(row=2, col=0)
         self.field_one_coord = self.coord_fild()
-        print(self.field_one_coord)
+
         field_two = self.field_creation(row=2, col=2)
 
         self.field_one.bind("<Button-1>", self.set_coordinates)
-        frame = tk.Frame(self)
-        frame.grid(row=4, column=1, sticky="n")
+        self.frame = tk.Frame(self)
+        self.frame.grid(row=4, column=1, sticky="n")
 
-        tk.Button(frame, text="Очистить поле", command=self.clear_fild).grid(row=1, column=1, sticky="n")
-        tk.Button(frame, text="Показать корабли", command=self.show_ships).grid(row=1, column=2, sticky="n")
-        tk.Button(frame, text="Скрыть корабли", command=self.hide_ships).grid(row=1, column=3, sticky="n")
+        tk.Button(self.frame, text="Очистить поле", command=self.clear_fild).grid(row=1, column=1, sticky="n")
+        tk.Button(self.frame, text="Показать корабли", command=self.show_ships).grid(row=1, column=2, sticky="n")
+        tk.Button(self.frame, text="Скрыть корабли", command=self.hide_ships).grid(row=1, column=3, sticky="n")
+        tk.Button(self.frame, text="Задать координаты кораблей", command=self.create_ships).grid(row=2, column=2, sticky="n")
 
     def clear_fild(self):
         self.field_one.delete("X")
@@ -92,7 +93,36 @@ class OnePlayer(tk.Toplevel):
         return ship_destroyed
 
 
+    def create_ships(self):
 
+        tk.Label(self.frame, text="text").grid(row=3, column=2, sticky="n")
+        self.field_one.bind("<Button-3>", self.set_coordinates)
+
+        pass
+
+
+
+
+    def outline_destroyed_ship(self, dict):
+        def valid_coord(coord):
+            if coord == 0:
+                list_coord = [coord, coord + 1]
+            elif coord == 9:
+                list_coord = [coord - 1, coord]
+            else:
+                list_coord = [coord - 1, coord, coord + 1]
+            return list_coord
+
+
+        for values in dict.values():
+            for coord in values.keys():
+                x = coord[0]
+                y = coord[1]
+
+                for i in valid_coord(x):
+                    for j in valid_coord(y):
+                        if self.field_one_coord[i, j] == "-":
+                            self.field_one_coord[i, j] = "0"
 
 
 
@@ -119,6 +149,7 @@ class OnePlayer(tk.Toplevel):
         ship_destroyed = self.check_ship_destroyed()
         print(self.ships)
         if ship_destroyed:
+            self.outline_destroyed_ship(ship_destroyed)
             print("Корабль уничтожен")
         else:
             print("Неа")
