@@ -1,7 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, PhotoImage
-import random
-import time
+from set_ships import SetShips
 
 
 
@@ -32,6 +30,8 @@ class OnePlayer(tk.Toplevel):
     def __init__(self, parent):
         tk.Toplevel.__init__(self, parent)
         self.wm_attributes("-topmost", 1)
+        label = tk.Label(self, text="Добро пожаловать в игру морской бой")
+        label.grid(row=1, column=0, columnspan=3, sticky="n")
 
         self.canvas_x = 400
         self.canvas_y = 400
@@ -39,22 +39,19 @@ class OnePlayer(tk.Toplevel):
         self.step_x = self.canvas_x // self.n_x
         self.step_y = self.canvas_y // self.n_y
 
-        label = tk.Label(self, text="Добро пожаловать в игру морской бой")
-        label.grid(row=1, column=0, columnspan=3, sticky="n")
+
 
         self.ships = {"Однопалубный_1": {(0, 0): "+"},
                       "Однопалубный_2": {(5, 7): "+"},
                       "Однопалубный_3": {(8, 1): "+"},
                       "Однопалубный_4": {(9, 9): "+"},
                       "Двухпалубный_1": {(2, 3): "+", (3, 3): "+"},
-                      "Двухпалубный_2": {(5, 1): "+", (6, 1): "+"},
-                      # "Трехпалубный": {(4, 1): "+", (5, 1): "+", (6, 1): "+"}
-                      }
+                      "Двухпалубный_2": {(5, 1): "+", (6, 1): "+"},}
+
+
 
         self.field_one = self.field_creation(row=2, col=0)
         self.field_one_coord = self.coord_fild()
-
-        field_two = self.field_creation(row=2, col=2)
 
         self.field_one.bind("<Button-1>", self.set_coordinates)
         self.frame = tk.Frame(self)
@@ -63,7 +60,7 @@ class OnePlayer(tk.Toplevel):
         tk.Button(self.frame, text="Очистить поле", command=self.clear_fild).grid(row=1, column=1, sticky="n")
         tk.Button(self.frame, text="Показать корабли", command=self.show_ships).grid(row=1, column=2, sticky="n")
         tk.Button(self.frame, text="Скрыть корабли", command=self.hide_ships).grid(row=1, column=3, sticky="n")
-        tk.Button(self.frame, text="Задать координаты кораблей", command=self.create_ships).grid(row=2, column=2, sticky="n")
+        tk.Button(self.frame, text="Задать координаты кораблей", command=self.set_coordinates_ship).grid(row=2, column=2, sticky="n")
 
     def clear_fild(self):
         self.field_one.delete("X")
@@ -79,6 +76,12 @@ class OnePlayer(tk.Toplevel):
                 n_y = coord[1] * self.step_y
                 self.field_one.create_rectangle(n_x, n_y, n_x + self.step_x, n_y + self.step_y, fill="black", tags=["ship"])
 
+    def set_coordinates_ship(self):
+        print(self.ships)
+        ships = SetShips(self)
+        self.ships = ships.open()
+        print(self.ships)
+
 
 
     def check_ship_destroyed(self):
@@ -91,16 +94,6 @@ class OnePlayer(tk.Toplevel):
                 break
 
         return ship_destroyed
-
-
-    def create_ships(self):
-
-        tk.Label(self.frame, text="text").grid(row=3, column=2, sticky="n")
-        self.field_one.bind("<Button-3>", self.set_coordinates)
-
-        pass
-
-
 
 
     def outline_destroyed_ship(self, dict):
