@@ -11,7 +11,8 @@ class SetShips(tk.Toplevel):
         container.grid(row=2, column=0, columnspan=3, sticky="n")
 
 
-        self.ships = {"Однопалубный_1": {(0, 0): "+"},
+        self.ships = {
+                        "Однопалубный_1": {(0, 0): "+"},
                       "Однопалубный_2": {(5, 7): "+"},
                       "Однопалубный_3": {(8, 1): "+"},
                       "Однопалубный_4": {(9, 9): "+"},
@@ -20,22 +21,29 @@ class SetShips(tk.Toplevel):
                       "Двухпалубный_3": {(5, 1): "+", (6, 1): "+"},
                       "Трехпалубный_1": {(4, 1): "+", (5, 1): "+", (6, 1): "+"},
                       "Трехпалубный_2": {(4, 1): "+", (5, 1): "+", (6, 1): "+"},
-                      "Четырехпалубный": {(4, 1): "+", (5, 1): "+", (6, 1): "+", (6, 1): "+"},
+                      "Четырехпалубный": {(4, 1): "+", (5, 1): "+", (6, 1): "+", (6, 2): "+"},
                       }
 
+        self.field_coord = self.coord_fild()
 
-        frame = Ship(container, self)
+        for ship, coord in self.ships.items():
+            frame = Ship(container, self, type=ship)
+            frame.grid(row=3, column=0, sticky="nsew")
+            frame.wait_window()
+            s = frame.get_ship()
+            self.ships[ship] = s
+            print(self.ships)
 
-        self.frames = {"Четырехпалубный": frame}
-        self.show_frame("Четырехпалубный")
+
 
         tk.Button(self, text="Готово", command=self.destroy).grid(row=10, column=0, columnspan=3, sticky="n")
 
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.grid(row=3, column=0, sticky="nsew")
-        frame.wait_window()
-        print(frame.ship)
+    def coord_fild(self):
+        fild = {}
+        for x in range(10):
+            for y in range(10):
+                fild[x, y] = '-'
+        return fild
 
     def open(self):
         self.grab_set()
@@ -44,8 +52,10 @@ class SetShips(tk.Toplevel):
 
 
 class Ship(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, type):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.type = type
 
         self.ship = {}
 
@@ -55,26 +65,53 @@ class Ship(tk.Frame):
         self.step_x = self.canvas_x // self.n_x
         self.step_y = self.canvas_y // self.n_y
 
-        self.field_one = self.field_creation(row=2, col=0)
-        self.field_one_coord = self.coord_fild()
-        self.field_one.bind("<Button-1>", self.set_coordinates)
+        self.field = self.field_creation(row=2, col=0)
+        self.field_coord = self.controller.field_coord
+        self.field.bind("<Button-1>", self.set_coordinates)
+        self.update_fild()
 
         tk.Button(self, text="Закончить ввод", command=self.destroy).grid(row=10, column=0, columnspan=3, sticky="n")
 
 
+    def get_ship(self):
+        return self.ship
+
     def set_coordinates(self, event):
-        if len(self.ship) != 4:
+        print("Длинна корабля",len(self.ship))
+        print("нужная линна корабля", len(self.controller.ships[self.type]))
+
+
+        if len(self.ship) != len(self.controller.ships[self.type]):
             x = event.x // self.step_x
             y = event.y // self.step_y
             self.ship[x, y] = "+"
             print(self.ship)
+            self.field_coord[x, y] = "X"
+            self.update_fild()
 
-        #     else: break
-        #
-        # if test:
-        #     self.field_one_coord[n_x, n_y] = "X"
-        # else:
-        #     self.field_one_coord[n_x, n_y] = "0"
+
+    def update_fild(self):
+
+        for coord in self.field_coord:
+            n_x = coord[0] * self.step_x
+            n_y = coord[1] * self.step_y
+            if self.field_coord[coord] == "X":
+
+                self.field.create_rectangle(n_x + 5, n_y + 5, n_x + self.step_x - 5, n_y + self.step_y - 5, fill="green", tags=["X"])
+
+
+            elif self.field_coord[coord] == "0":
+                self.field.create_line(n_x + 5, n_y + 5, n_x + self.step_x - 5, n_y + self.step_y - 5,
+                                       fill="black", tags=["X"])
+
+                self.field.create_line(n_x + self.step_x - 5,
+                                       n_y + 5,
+                                       n_x + 5,
+                                       n_y + self.step_y - 5,
+                                       fill="black", tags=["X"])
+
+
+
 
 
 
@@ -106,11 +143,6 @@ class Ship(tk.Frame):
             field.create_line(self.step_x * i, 0, self.step_x * i, self.canvas_y)
         return field
 
-    def coord_fild(self):
-        fild = {}
-        for x in range(10):
-            for y in range(10):
-                fild[x, y] = '-'
-        return fild
+
 
 
