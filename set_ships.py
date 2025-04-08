@@ -7,12 +7,11 @@ class SetShips(tk.Toplevel):
 
         label = tk.Label(self, text="Добро пожаловать в игру морской бой")
         label.grid(row=1, column=0, columnspan=3, sticky="n")
-        container = tk.Frame(self, height=500, width=500)
-        container.grid(row=2, column=0, columnspan=3, sticky="n")
+        self.container = tk.Frame(self, height=500, width=500)
+        self.container.grid(row=2, column=0, columnspan=3, sticky="n")
 
 
-        self.ships = {
-                        "Однопалубный_1": {(0, 0): "+"},
+        self.ships = {"Однопалубный_1": {(0, 0): "+"},
                       "Однопалубный_2": {(5, 7): "+"},
                       "Однопалубный_3": {(8, 1): "+"},
                       "Однопалубный_4": {(9, 9): "+"},
@@ -26,17 +25,10 @@ class SetShips(tk.Toplevel):
 
         self.field_coord = self.coord_fild()
 
-        for ship, coord in self.ships.items():
-            frame = Ship(container, self, type=ship)
-            frame.grid(row=3, column=0, sticky="nsew")
-            frame.wait_window()
-            s = frame.get_ship()
-            self.ships[ship] = s
-            print(self.ships)
+        tk.Button(self, text="Начать", command=self.set_ship).grid(row=10, column=0, columnspan=3, sticky="n")
 
-
-
-        tk.Button(self, text="Готово", command=self.destroy).grid(row=10, column=0, columnspan=3, sticky="n")
+        self.cancel_btn = tk.Button(self, text="Готово", state="disabled", command=self.destroy)
+        self.cancel_btn.grid(row=12, column=0, columnspan=3, sticky="n")
 
     def coord_fild(self):
         fild = {}
@@ -49,6 +41,15 @@ class SetShips(tk.Toplevel):
         self.grab_set()
         self.wait_window()
         return self.ships
+
+    def set_ship(self):
+        for ship, coord in self.ships.items():
+            frame = Ship(self.container, self, type=ship)
+            frame.grid(row=3, column=0, sticky="nsew")
+            frame.wait_window()
+            s = frame.get_ship()
+            self.ships[ship] = s
+        self.cancel_btn["state"] = "active"
 
 
 class Ship(tk.Frame):
