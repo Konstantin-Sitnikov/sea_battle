@@ -5,7 +5,7 @@ class SetShips(tk.Toplevel):
         tk.Toplevel.__init__(self, parent)
         self.wm_attributes("-topmost", 1)
 
-        label = tk.Label(self, text="Добро пожаловать в игру морской бой")
+        label = tk.Label(self, text="Окно для ручной установки кораблей")
         label.grid(row=1, column=0, columnspan=3, sticky="n")
         self.container = tk.Frame(self, height=500, width=500)
         self.container.grid(row=2, column=0, columnspan=3, sticky="n")
@@ -20,10 +20,11 @@ class SetShips(tk.Toplevel):
                       "Двухпалубный_3": {(5, 1): "+", (6, 1): "+"},
                       "Трехпалубный_1": {(4, 1): "+", (5, 1): "+", (6, 1): "+"},
                       "Трехпалубный_2": {(4, 1): "+", (5, 1): "+", (6, 1): "+"},
-                      "Четырехпалубный": {(4, 1): "+", (5, 1): "+", (6, 1): "+", (6, 2): "+"},
+                      "Четырехпалубный_1": {(4, 1): "+", (5, 1): "+", (6, 1): "+", (6, 2): "+"},
                       }
 
-        self.field_coord = self.coord_fild()
+        self.field_coord = {}
+        self.coord_fild()
 
         tk.Button(self, text="Начать", command=self.set_ship).grid(row=10, column=0, columnspan=3, sticky="n")
 
@@ -31,11 +32,10 @@ class SetShips(tk.Toplevel):
         self.cancel_btn.grid(row=12, column=0, columnspan=3, sticky="n")
 
     def coord_fild(self):
-        fild = {}
         for x in range(10):
             for y in range(10):
-                fild[x, y] = '-'
-        return fild
+                self.field_coord[x, y] = '-'
+
 
     def open(self):
         self.grab_set()
@@ -57,6 +57,7 @@ class Ship(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.type = type
+        tk.Label(self, text=f'Задайте {type[0:-2]} корабль!').grid(row=1, column=1, sticky="nsew")
 
         self.ship = {}
 
@@ -89,6 +90,7 @@ class Ship(tk.Frame):
             print(self.ship)
             self.field_coord[x, y] = "X"
             self.update_fild()
+
 
 
     def update_fild(self):
